@@ -11,6 +11,8 @@ from custom_data import ImageDataset
 from lora import LoRALinear
 import matplotlib.pyplot as plt
 
+torch.set_num_threads(torch.get_num_threads())
+
 
 def train(model, dataloader, criterion, optimizer, device):
     model.train()
@@ -66,7 +68,7 @@ def validate(model, dataloader, criterion, device):
 # Settings
 json_file = "./dataset/DFDCP.json"
 images_root = "./dataset"
-batch_size = 128
+batch_size = 1024
 num_epochs = 5
 learning_rate = 3e-4
 
@@ -146,6 +148,11 @@ for epoch in range(num_epochs):
     print(f"Training - Loss: {train_loss_epoch:.4f}, Accuracy: {train_acc_epoch:.2f}%")
     print(f"Validation - Loss: {val_loss_epoch:.4f}, Accuracy: {val_acc_epoch:.2f}%")
 
+    # Save the fine-tuned model checkpoint.
+    checkpoint_path = f"./weights/lora/vit_finetuned_lora_{epoch}.pth"
+    torch.save(model.state_dict(), checkpoint_path)
+    print(f"Training finished. Model saved to {checkpoint_path}")
+
 # Plotting loss and accuracy curves.
 epochs = range(1, num_epochs + 1)
 
@@ -172,8 +179,3 @@ plt.legend()
 plot_path = "training_plots_vit_lora.png"
 plt.savefig(plot_path)
 print(f"Plots saved to {plot_path}")
-
-# Save the fine-tuned model checkpoint.
-checkpoint_path = "vit_finetuned_lora.pth"
-torch.save(model.state_dict(), checkpoint_path)
-print(f"Training finished. Model saved to {checkpoint_path}")
