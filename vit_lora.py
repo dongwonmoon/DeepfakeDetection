@@ -29,17 +29,13 @@ def train(model, dataloader, criterion, optimizer, device):
         loss.backward()
         optimizer.step()
 
-        running_loss += loss.item()
+        running_loss = loss.item()
         # Calculate training accuracy in batch
         predictions = outputs.argmax(dim=1)
         total_correct += (predictions == labels).sum().item()
         total_samples += images.size(0)
 
-        if (batch_idx + 1) % 10 == 0:
-            print(
-                f"Train Batch {batch_idx+1}/{len(dataloader)} - Loss: {running_loss / 10:.4f}"
-            )
-            running_loss = 0.0
+        print(f"Train Batch {batch_idx+1}/{len(dataloader)} - Loss: {running_loss:.4f}")
     avg_loss = running_loss / len(dataloader)
     accuracy = total_correct / total_samples * 100.0
     return avg_loss, accuracy
@@ -69,7 +65,7 @@ def validate(model, dataloader, criterion, device):
 json_file = "./dataset/DFDCP.json"
 images_root = "./dataset"
 batch_size = 1024
-num_epochs = 5
+num_epochs = 1
 learning_rate = 3e-4
 
 # Device configuration
