@@ -60,7 +60,7 @@ if __name__ == "__main__":
     # 설정
     json_file = "./dataset/DFDCP.json"
     images_root = "./dataset"
-    batch_size = 1024
+    batch_size = 128
     num_epochs = 10
     learning_rate = 3e-4
 
@@ -88,9 +88,9 @@ if __name__ == "__main__":
 
     # pretrained ViT 모델 로드 및 LoRA로 분리(freeze)
     model = ViT("B_16", pretrained=True)
-    in_features = model.fc.in_features
-    model.fc = nn.Linear(in_features, out_features=2)
     lora_model = LoRA_ViT(model, r=4, alpha=4)
+    in_features = lora_model.lora_vit.fc.in_features
+    lora_model.lora_vit.fc = nn.Linear(in_features, out_features=2)
     num_params = sum(p.numel() for p in lora_model.parameters() if p.requires_grad)
     print(f"Trainable parameters: {num_params/2**20:.4f}M")
     model = lora_model.to(device)
