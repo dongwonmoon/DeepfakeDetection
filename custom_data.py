@@ -50,7 +50,7 @@ class ImageDataset(torch.utils.data.Dataset):
             partition = domain_data.get(self.cur_type, {})
             for image in partition:
                 image_info = partition.get(image, {})
-                paths = image_info.get("frames", {})
+                paths = [path.replace("\\", "/") for path in image_info.get("frames", {})]
                 label = image_info.get("label", "")
                 for path in paths:
                     self.image_paths.append(path)
