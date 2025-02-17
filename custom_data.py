@@ -50,11 +50,17 @@ class ImageDataset(torch.utils.data.Dataset):
             partition = domain_data.get(self.cur_type, {})
             for image in partition:
                 image_info = partition.get(image, {})
-                paths = [path.replace("\\", "/") for path in image_info.get("frames", {})]
+                paths = [
+                    path.replace("\\", "/") for path in image_info.get("frames", {})
+                ]
                 label = image_info.get("label", "")
                 for path in paths:
-                    self.image_paths.append(path)
-                    self.labels.append(label)
+                    if os.path.exists(os.path.join(self.images_root, path)):
+                        self.image_paths.append(path)
+                        self.labels.append(label)
+                    else:
+                        continue
+
         if len(self.image_paths) != len(self.labels):
             raise RuntimeError("Mismatch in image paths and labels")
         if not self.image_paths:
