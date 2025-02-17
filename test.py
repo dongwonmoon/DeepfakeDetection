@@ -7,6 +7,7 @@ from custom_data import ImageDataset
 from base_vit import ViT
 from lora import LoRA_ViT
 import matplotlib.pyplot as plt
+import tqdm
 
 
 def test(model, dataloader, criterion, device):
@@ -15,7 +16,7 @@ def test(model, dataloader, criterion, device):
     total_correct = 0
     total_samples = 0
     with torch.no_grad():
-        for images, labels in dataloader:
+        for images, labels in tqdm.tqdm(dataloader):
             images = images.to(device)
             labels = labels.to(device)
             outputs = model(images)
@@ -33,7 +34,7 @@ if __name__ == "__main__":
     # 설정
     json_file = "./dataset/DFDCP.json"
     images_root = "./dataset"
-    batch_size = 128
+    batch_size = 100
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -59,7 +60,11 @@ if __name__ == "__main__":
     model = lora_model.to(device)
     model = torch.nn.DataParallel(model)
     model.load_state_dict(
-        torch.load("./weights/lora/vit_finetuned_lora_1.pth", map_location=device)
+        torch.load(
+            "./weights/lora/vit_finetuned_lora_1.pth",
+            map_location=device,
+            weights_only=True,
+        )
     )
 
     criterion = nn.CrossEntropyLoss()
